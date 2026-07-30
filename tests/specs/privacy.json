@@ -7,7 +7,7 @@
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Display privacy policy"
+              "text": "We collect your name, phone number, and email only to respond to your property enquiry.\n\nYour details are stored securely and shared with the real-estate team handling your request."
             }
           }
         ],

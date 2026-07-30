@@ -7,7 +7,7 @@
         "expect": [
           {
             "method": "sendMessage",
-            "payload": { "text": "👋 Welcome! Tap a button below to get started." }
+            "payload": { "text": "Welcome to Real Estate Leads.\n\nShare your details and our team can help with your property search." }
           }
         ]
       }

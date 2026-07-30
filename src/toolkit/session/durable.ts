@@ -43,12 +43,21 @@ export interface WorkerEnv {
   BOT_TELEMETRY_URL?: string;
   BOT_TELEMETRY_SECRET?: string;
   BOT_TELEMETRY_SALT?: string;
+  ADMIN_CHAT_ID?: string;
 }
 
 interface Reminder {
   at: number; // epoch ms
   chatId: number | string;
   text: string;
+}
+
+interface StoredLead {
+  userId: number;
+}
+
+interface LeadIndex {
+  leadKeys: string[];
 }
 
 /**
@@ -142,6 +151,17 @@ export class ChatDO {
         await this.state.storage.delete("session");
         return new Response(null, { status: 204 });
       }
+    }
+
+    // Durable domain records are stored through explicit indexes, never via a
+    // keyspace scan. Each user's lead records live with that user's chat DO.
+    if (url.pathname === "/lead" && request.method === "POST") {
+      const lead = (await request.json()) as StoredLead;
+      const index = (await this.state.storage.get<LeadIndex>("lead-index")) ?? { leadKeys: [] };
+      const key = `lead:${index.leadKeys.length + 1}`;
+      await this.state.storage.put(key, lead);
+      await this.state.storage.put("lead-index", { leadKeys: [...index.leadKeys, key] });
+      return new Response(null, { status: 204 });
     }
 
     // Schedule a reminder + (re)arm the alarm to the earliest due one.

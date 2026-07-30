@@ -1,20 +1,35 @@
 [
   {
-    "name": "/new",
+    "name": "a user can submit a lead from /new",
     "steps": [
-      {
-        "expect": [
-          {
-            "method": "sendMessage",
-            "payload": {
-              "text": "Begin a new lead submission flow"
-            }
-          }
-        ],
-        "send": {
-          "text": "/new"
-        }
-      }
+      { "send": { "text": "/new" }, "expect": [{ "method": "sendMessage", "payload": { "text": "What is your full name?" } }] },
+      { "send": { "text": "Avery Morgan" }, "expect": [{ "method": "sendMessage", "payload": { "text": "What phone number should we use?" } }] },
+      { "send": { "text": "+44 20 7946 0958" }, "expect": [{ "method": "sendMessage", "payload": { "text": "What email address should we use?" } }] },
+      { "send": { "text": "avery@example.com" }, "expect": [{ "method": "sendMessage", "payload": { "text": "Please check your details.\n\nName: Avery Morgan\nPhone: +44 20 7946 0958\nEmail: avery@example.com" } }] },
+      { "send": { "callback": "lead:confirm" }, "expect": [{ "method": "editMessageText", "payload": { "text": "Your details have been saved. The team notification isn't set up yet." } }] }
+    ]
+  },
+  {
+    "name": "invalid phone and email are rejected before confirmation",
+    "steps": [
+      { "send": { "text": "/new" }, "expect": [{ "method": "sendMessage", "payload": { "text": "What is your full name?" } }] },
+      { "send": { "text": "Avery Morgan" }, "expect": [{ "method": "sendMessage", "payload": { "text": "What phone number should we use?" } }] },
+      { "send": { "text": "not-a-phone" }, "expect": [{ "method": "sendMessage", "payload": { "text": "That phone number doesn't look right. Enter a number with at least seven digits." } }] },
+      { "send": { "text": "+1 415 555 0123" }, "expect": [{ "method": "sendMessage", "payload": { "text": "What email address should we use?" } }] },
+      { "send": { "text": "not-an-email" }, "expect": [{ "method": "sendMessage", "payload": { "text": "That email address doesn't look right. Check it and try again." } }] }
+    ]
+  },
+  {
+    "name": "a user can cancel a pending lead",
+    "steps": [
+      { "send": { "text": "/new" }, "expect": [{ "method": "sendMessage", "payload": { "text": "What is your full name?" } }] },
+      { "send": { "callback": "lead:cancel" }, "expect": [{ "method": "editMessageText", "payload": { "text": "Your lead submission was cancelled." } }] }
+    ]
+  },
+  {
+    "name": "the New lead menu button begins the form",
+    "steps": [
+      { "send": { "callback": "lead:new" }, "expect": [{ "method": "sendMessage", "payload": { "text": "What is your full name?" } }] }
     ]
   }
 ]
